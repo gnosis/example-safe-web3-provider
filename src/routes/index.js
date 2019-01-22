@@ -3,7 +3,7 @@ import { Switch, Route } from 'react-router-dom'
 
 import { HOME_URL } from '~/routes/routes'
 import Page from '~/components/Page'
-import Home from '~/routes/Home/containers/Home'
+import Home from '~/routes/home/containers/Home'
 
 const AppRoutes = () => (
   <Page>
