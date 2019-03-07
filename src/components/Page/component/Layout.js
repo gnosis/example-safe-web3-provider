@@ -5,27 +5,32 @@ const Layout = ({
   connected,
   connectSafeWeb3Provider,
   connectProvider,
-  sendTransaction
+  sendTransaction,
+  signTypedData,
+  signature
 }) => (
   <React.Fragment>
     <div>
       <br />
+      Remember to whitelist this Dapp in your Safe Browser Extension.
       <div>
-        This button will ensure the use of the Safe Web3 Provider. Remember to whitelist this Dapp in your Safe Browser Extension.
-        <br />
-        <button onClick={connectSafeWeb3Provider}>Connect to Gnosis Safe</button>
+        <h3>Connect to provider:</h3>
+        <button onClick={connectSafeWeb3Provider}>Local Gnosis Safe provider</button>
+        <br /><br />
+        <button onClick={connectProvider}>First injected provider</button>
       </div>
-      <br /><br />
+      <br />
       <div>
-        This button will use the first injected provider. Remember to whitelist this Dapp if you are only using the Safe Browser Extension.
-        <br />
-        <button onClick={connectProvider}>Connect to injected provider</button>
-      </div>
-      <br /><br />
-      <div>
-        Make a transaction
-        <br />
+        <h3>Make a transaction:</h3>
         <button disabled={!connected} onClick={sendTransaction}>Send 0.01 ETH</button>
+      </div>
+      <br />
+      <div>
+        <h3>Sign typed data:</h3>
+        <button disabled={!connected} onClick={signTypedData}>Sign typed data</button>
+        <br/>
+        Wallet signature:
+        <div style={{wordBreak:'break-all'}}>{signature}</div>
       </div>
     </div>
     {connected &&
