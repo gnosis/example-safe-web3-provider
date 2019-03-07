@@ -7,7 +7,8 @@ const Layout = ({
   connectProvider,
   sendTransaction,
   signTypedData,
-  signature
+  signature,
+  currentProviderName
 }) => (
   <React.Fragment>
     <div>
@@ -18,11 +19,13 @@ const Layout = ({
         <button onClick={connectSafeWeb3Provider}>Local Gnosis Safe provider</button>
         <br /><br />
         <button onClick={connectProvider}>First injected provider</button>
+        <br /><br />
+        Current provider: {currentProviderName}
       </div>
       <br />
       <div>
         <h3>Make a transaction:</h3>
-        <button disabled={!connected} onClick={sendTransaction}>Send 0.01 ETH</button>
+        <button disabled={!connected} onClick={sendTransaction}>Send 0.001 ETH</button>
       </div>
       <br />
       <div>

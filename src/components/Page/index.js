@@ -44,6 +44,26 @@ class Page extends Component {
     return provider.account ? true : false
   }
 
+  getCurrentProviderName = () => {
+    const web3 = getWeb3Provider()
+    if (!web3) {
+      return null
+    }
+
+    let name
+    switch (web3.currentProvider.constructor.name) {
+      case 'SafeWeb3Provider':
+        name = 'GnosisSafe'
+        break
+      case 'MetamaskInpageProvider':
+        name = 'Metamask'
+        break
+      default:
+        name = 'Unknown provider'
+    }
+    return name
+  }
+
   sendTransactionPromise = (web3Provider, from, to, value) => {
     return new Promise ((resolve, reject) => {
       web3Provider.eth.sendTransaction({ from, to, value }, (error, result) => {
@@ -60,7 +80,7 @@ class Page extends Component {
     try {
       const web3 = getWeb3Provider()
       const [account] = await promisify(cb => web3.eth.getAccounts(cb))
-      const val = web3.toWei('0.01', 'ether')
+      const val = web3.toWei('0.001', 'ether')
       const transactionHash = await this.sendTransactionPromise(web3, account, account, val)
       console.log('Transaction hash:', transactionHash)
     } catch (error) {
@@ -122,6 +142,7 @@ class Page extends Component {
     const { children } = this.props
     const { signature } = this.state
     const connected = this.isProviderUsable()
+    const currentProviderName = this.getCurrentProviderName()
 
     return (
       <Layout
@@ -132,6 +153,7 @@ class Page extends Component {
         sendTransaction={this.sendTransaction}
         signTypedData={this.signTypedData}
         signature={signature}
+        currentProviderName={currentProviderName}
       />
     )
   }
