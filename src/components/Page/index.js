@@ -8,12 +8,19 @@ import selector from './selector'
 import Layout from './component/Layout'
 
 class Page extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      signature: undefined
+    }
+  }
+
   componentDidMount = async () => {
     const { onUpdateProvider } = this.props
-    
+
     let provider = await getWeb3ProviderData()
     onUpdateProvider(provider.networkId, provider.account, provider.ethBalance)
-    
+
     this.intervalId = setInterval(async () => {
       const newProvider = await getWeb3ProviderData()
       if (JSON.stringify(provider) !== JSON.stringify(newProvider)) {
@@ -37,6 +44,26 @@ class Page extends Component {
     return provider.account ? true : false
   }
 
+  getCurrentProviderName = () => {
+    const web3 = getWeb3Provider()
+    if (!web3) {
+      return null
+    }
+
+    let name
+    switch (web3.currentProvider.constructor.name) {
+      case 'SafeWeb3Provider':
+        name = 'GnosisSafe'
+        break
+      case 'MetamaskInpageProvider':
+        name = 'Metamask'
+        break
+      default:
+        name = 'Unknown provider'
+    }
+    return name
+  }
+
   sendTransactionPromise = (web3Provider, from, to, value) => {
     return new Promise ((resolve, reject) => {
       web3Provider.eth.sendTransaction({ from, to, value }, (error, result) => {
@@ -53,7 +80,7 @@ class Page extends Component {
     try {
       const web3 = getWeb3Provider()
       const [account] = await promisify(cb => web3.eth.getAccounts(cb))
-      const val = web3.toWei('0.01', 'ether')
+      const val = web3.toWei('0.001', 'ether')
       const transactionHash = await this.sendTransactionPromise(web3, account, account, val)
       console.log('Transaction hash:', transactionHash)
     } catch (error) {
@@ -61,9 +88,62 @@ class Page extends Component {
     }
   }
 
+  signTypedData = () => {
+    const web3 = getWeb3Provider()
+    this.setState({ signature: undefined })
+
+    const msgParams = JSON.stringify({
+      types: {
+        EIP712Domain: [
+          { name: "name", type: "string" },
+          { name: "version", type: "string" },
+          { name: "chainId", type: "uint256" },
+          { name: "verifyingContract", type: "address" }
+        ],
+        Person: [
+          { name: "name", type: "string" },
+          { name: "wallet", type: "address" }
+        ],
+        Mail: [
+          { name: "from", type: "Person" },
+          { name: "to", type: "Person" },
+          { name: "contents", type: "string" }
+        ]
+      },
+      primaryType: "Mail",
+      domain: { name: "Ether Mail", version: "1", chainId: 1, verifyingContract: "0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC" },
+      message: {
+        from: { name: "Cow", wallet: "0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826" },
+        to: { name: "Bob", wallet: "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB" },
+        contents: "Hello, Bob!"
+      }
+    })
+
+    const from = web3.eth.accounts[0]
+    const params = [from, msgParams]
+    const method = 'wallet_signTypedData'
+    console.log(params)
+
+    const self = this
+    web3.currentProvider.sendAsync({
+      method,
+      params,
+      from,
+    }, (err, result) => {
+      if (err) {
+        console.log(err)
+        return
+      }
+      self.setState({ signature: JSON.stringify(result.result) })
+    })
+  }
+
   render = () => {
     const { children } = this.props
+    const { signature } = this.state
     const connected = this.isProviderUsable()
+    const currentProviderName = this.getCurrentProviderName()
+
     return (
       <Layout
         children={children}
@@ -71,6 +151,9 @@ class Page extends Component {
         connectSafeWeb3Provider={loadSafeWeb3Provider}
         connectProvider={this.connectProvider}
         sendTransaction={this.sendTransaction}
+        signTypedData={this.signTypedData}
+        signature={signature}
+        currentProviderName={currentProviderName}
       />
     )
   }
