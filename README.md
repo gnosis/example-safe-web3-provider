@@ -2,7 +2,7 @@
 
 This basic project shows an example on how to use the [SafeWeb3Provider](https://github.com/gnosis/safe-web3-provider).
 
-The [Safe Browser Extension](https://github.com/gnosis/safe-browser-extension) must be installed and configured.
+The [Gnosis Safe Authenticator](https://github.com/gnosis/safe-browser-extension) must be installed and configured.
 
 ## Installation
 Install dependencies
@@ -48,11 +48,11 @@ const txHash = await web3.eth.sendTransaction(tx)
 ```
 
 ## Dapp interaction
-Dapps like this one must be **whitelisted** in the Safe Browser Extension in order to have full access to the provider.
+Dapps like this one must be **whitelisted** in the Gnosis Safe Authenticator in order to have full access to the provider.
 
 **Different situations:**
 
-- **Only Safe Browser Extension is installed**
+- **Only Gnosis Safe Authenticator is installed**
 	- **Dapp is not whitelisted**
 		- *Dapp integrates safe-web3-provider*
 			- Dapp is unusable. Local safe-web3-provider is empty (no Safe account data and pop-up never opens).
@@ -60,7 +60,7 @@ Dapps like this one must be **whitelisted** in the Safe Browser Extension in ord
 		- *Dapp integrates safe-web3-provider*
 			- safe-web3-provider is injected by default. Local safe-web3-provider can be used if selected.
 	
-- **Both Safe Browser Extension and Metamask are installed**
+- **Both Gnosis Safe Authenticator and Metamask are installed**
 	- **Dapp is not whitelisted**
 		- *Metamask is used*
 	- **Dapp is whitelisted**
